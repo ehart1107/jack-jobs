@@ -198,6 +198,25 @@
     text-transform: uppercase; letter-spacing: 0.4px;
   }
 
+  /* Applied checkbox */
+  .applied-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 10px;
+  }
+  .applied-checkbox {
+    width: 16px; height: 16px; cursor: pointer; accent-color: #48bb78;
+  }
+  .applied-label { font-size: 13px; color: #a0aec0; cursor: pointer; user-select: none; }
+  .applied-badge {
+    display: inline-block; background: #22543d; color: #68d391;
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 6px; margin-left: 8px; letter-spacing: 0.3px;
+  }
+  .job-card.state-applied { border-color: #276749; }
+  .job-card.state-applied .card-title::after {
+    content: ' ✅'; font-size: 13px;
+  }
+
   .dismissed-banner {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 12px; background: #4a1c1c; border-radius: 8px;
@@ -253,6 +272,7 @@
     <div class="stat-card"><div class="value" id="statInterested">—</div><div class="label">👍 Interested</div></div>
     <div class="stat-card"><div class="value" id="statDismissed">—</div><div class="label">👎 Dismissed</div></div>
     <div class="stat-card"><div class="value" id="statPending">—</div><div class="label">Not reviewed</div></div>
+    <div class="stat-card"><div class="value" id="statApplied">—</div><div class="label">✅ Applied</div></div>
   </div>
 
   <div class="filters">
@@ -264,6 +284,7 @@
     <button class="filter-btn" data-filter="Hybrid">Hybrid</button>
     <button class="filter-btn" data-filter="SASE">SASE / SD-WAN</button>
     <button class="filter-btn" data-filter="Security">Security</button>
+    <button class="filter-btn" data-filter="applied">✅ Applied</button>
   </div>
 
   <div class="jobs-grid" id="jobsGrid">
@@ -296,7 +317,14 @@
   }
 
   function getFeedback(id) {
-    return feedback[id] || { status: null, comment: '' };
+    return feedback[id] || { status: null, comment: '', applied: false };
+  }
+
+  function setApplied(id, checked) {
+    if (!feedback[id]) feedback[id] = { status: null, comment: '', applied: false };
+    feedback[id].applied = checked;
+    saveFeedback();
+    rerenderCard(id);
   }
 
   function setStatus(id, status) {
@@ -336,6 +364,7 @@
     const fb = getFeedback(j.id);
     const isNotInterested = fb.status === 'not-interested';
     const isInterested = fb.status === 'interested';
+    const isApplied = !!fb.applied;
 
     // If not-interested and hidden mode is off, render a collapsed placeholder
     if (isNotInterested && !showHidden) {
@@ -352,7 +381,11 @@
 
     const tags = j.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-    const stateClass = isInterested ? 'state-interested' : isNotInterested ? 'state-not-interested show-hidden' : '';
+    const stateClass = [
+      isInterested ? 'state-interested' : '',
+      isNotInterested ? 'state-not-interested show-hidden' : '',
+      isApplied ? 'state-applied' : ''
+    ].join(' ').trim();
 
     const dismissedBanner = isNotInterested ? `
       <div class="dismissed-banner">
@@ -402,6 +435,14 @@
           <textarea class="comment-area" id="comment-${j.id}"
             placeholder="Why are you interested or not? What's missing? (e.g. 'OTE too low', 'love the SASE angle', 'company too early stage'…)"
             oninput="setComment('${j.id}', this.value)">${fb.comment || ''}</textarea>
+          <div class="applied-row">
+            <input type="checkbox" class="applied-checkbox" id="applied-${j.id}"
+              ${isApplied ? 'checked' : ''}
+              onchange="setApplied('${j.id}', this.checked)">
+            <label class="applied-label" for="applied-${j.id}">
+              Applied${isApplied ? '<span class="applied-badge">✅ Applied</span>' : ''}
+            </label>
+          </div>
           ${dismissedBanner}
         </div>
       </div>
@@ -441,6 +482,7 @@
       else if (activeFilter === 'Hybrid') show = wt === 'Hybrid';
       else if (activeFilter === 'SASE') show = tags.includes('sase') || tags.includes('sd-wan');
       else if (activeFilter === 'Security') show = tags.includes('security') || tags.includes('cybersecurity');
+      else if (activeFilter === 'applied') show = getFeedback(card.dataset.id).applied;
 
       // Don't show not-interested in any filter unless showHidden
       if (fb.status === 'not-interested' && !showHidden) show = false;
@@ -456,11 +498,14 @@
     const dismissed = allJobs.filter(j => getFeedback(j.id).status === 'not-interested').length;
     const pending = allJobs.filter(j => !getFeedback(j.id).status).length;
 
+    const applied = allJobs.filter(j => getFeedback(j.id).applied).length;
+
     document.getElementById('statTotal').textContent = total;
     document.getElementById('statStrong').textContent = allJobs.filter(j => j.fitScore === 5).length;
     document.getElementById('statInterested').textContent = interested;
     document.getElementById('statDismissed').textContent = dismissed;
     document.getElementById('statPending').textContent = pending;
+    document.getElementById('statApplied').textContent = applied;
   }
 
   function updateActiveCount() {
@@ -479,6 +524,7 @@
   function exportFeedback() {
     const summary = {
       exportedAt: new Date().toISOString().split('T')[0],
+      applied: [],
       interested: [],
       notInterested: [],
       pending: []
@@ -492,8 +538,10 @@
         company: j.company,
         tags: j.tags,
         fitScore: j.fitScore,
+        applied: !!fb.applied,
         comment: fb.comment || null
       };
+      if (fb.applied) summary.applied.push(entry);
       if (fb.status === 'interested') summary.interested.push(entry);
       else if (fb.status === 'not-interested') summary.notInterested.push(entry);
       else summary.pending.push(entry);
