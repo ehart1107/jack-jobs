@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jack Dearl – Job Search Dashboard</title>
+<title>Jack – Job Search Dashboard</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -237,6 +237,55 @@
 
   .no-results { text-align: center; color: #718096; padding: 60px 20px; font-size: 14px; }
 
+  /* Self-added badge */
+  .self-added-badge {
+    font-size: 11px; font-weight: 700; padding: 2px 8px;
+    border-radius: 6px; background: #44337a; color: #b794f4;
+    letter-spacing: 0.3px;
+  }
+  .job-card.self-added { border-left: 3px solid #805ad5; }
+  .btn-delete-manual {
+    background: transparent; border: 1px solid #4a5568;
+    color: #718096; border-radius: 6px; padding: 4px 10px;
+    font-size: 11px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-delete-manual:hover { border-color: #fc8181; color: #fc8181; }
+
+  /* Add role modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #1a1f2e; border: 1px solid #2d3748;
+    border-radius: 16px; padding: 32px; width: 100%;
+    max-width: 520px; margin: 20px;
+  }
+  .modal h2 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .modal p { font-size: 13px; color: #718096; margin-bottom: 24px; }
+  .form-row { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; color: #a0aec0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .form-input, .form-select {
+    width: 100%; background: #0f1117; border: 1px solid #2d3748;
+    border-radius: 8px; color: #e2e8f0; padding: 10px 12px;
+    font-size: 13px; font-family: inherit; transition: border-color 0.15s;
+  }
+  .form-input:focus, .form-select:focus { outline: none; border-color: #4a5568; }
+  .form-select option { background: #1a1f2e; }
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .btn-cancel {
+    background: transparent; border: 1px solid #4a5568; color: #a0aec0;
+    border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-cancel:hover { border-color: #718096; color: #e2e8f0; }
+  .btn-add-submit {
+    background: #553c9a; border: none; color: #fff;
+    border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+  }
+  .btn-add-submit:hover { background: #44337a; }
+
   footer {
     text-align: center; padding: 32px;
     font-size: 12px; color: #4a5568;
@@ -254,13 +303,14 @@
 
 <header>
   <div class="header-left">
-    <h1>🎯 Jack Dearl — Job Search</h1>
+    <h1>🎯 Jack — Job Search</h1>
     <p>London · Enterprise SaaS / Security / SASE · Under 2,000 employees</p>
   </div>
   <div class="header-actions">
     <div class="meta-pill">Updated: <span id="lastUpdated">—</span></div>
     <div class="meta-pill"><span id="jobCount">—</span> active roles</div>
     <button class="btn-show-hidden" id="toggleHidden" onclick="toggleHidden()">Show dismissed</button>
+    <button class="btn-export" style="background:#553c9a;border-color:#805ad5;color:#e9d8fd;" onclick="openAddModal()">➕ Add a role</button>
     <button class="btn-export" onclick="exportFeedback()">⬇ Export feedback</button>
   </div>
 </header>
@@ -293,18 +343,84 @@
 </main>
 
 <footer>
-  Built by Cowork · Refreshed daily · <a href="https://www.linkedin.com/in/jackldearl/" target="_blank" style="color:#63b3ed;">Jack's LinkedIn</a>
-  &nbsp;·&nbsp; Feedback saves automatically in your browser
+  Built by Cowork · Refreshed daily · Feedback saves automatically in your browser
 </footer>
 
 <script>
   // ── State ──────────────────────────────────────────────────
   let allJobs = [];
-  let feedback = {}; // { jobId: { status: 'interested'|'not-interested'|null, comment: '' } }
+  let manualJobs = [];
+  let feedback = {}; // { jobId: { status, comment, applied } }
   let showHidden = false;
   let activeFilter = 'all';
 
   const STORAGE_KEY = 'jack_jobs_feedback';
+  const MANUAL_KEY  = 'jack_manual_jobs';
+
+  function getDisplayJobs() { return [...allJobs, ...manualJobs]; }
+
+  // ── Manual jobs ────────────────────────────────────────────
+  function loadManualJobs() {
+    try { manualJobs = JSON.parse(localStorage.getItem(MANUAL_KEY) || '[]'); }
+    catch { manualJobs = []; }
+  }
+
+  function saveManualJobs() {
+    localStorage.setItem(MANUAL_KEY, JSON.stringify(manualJobs));
+  }
+
+  function openAddModal() {
+    ['f-title','f-company','f-link','f-tags','f-note'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-worktype').value = 'Hybrid';
+    document.getElementById('addModal').classList.add('open');
+  }
+
+  function closeAddModal() {
+    document.getElementById('addModal').classList.remove('open');
+  }
+
+  function submitAddForm() {
+    const title   = document.getElementById('f-title').value.trim();
+    const company = document.getElementById('f-company').value.trim();
+    if (!title || !company) { alert('Title and company are required.'); return; }
+
+    const tags = document.getElementById('f-tags').value
+      .split(',').map(t => t.trim()).filter(Boolean);
+    const note = document.getElementById('f-note').value.trim();
+    const id   = 'manual-' + Date.now();
+
+    const job = {
+      id, title, company,
+      link:      document.getElementById('f-link').value.trim() || null,
+      workType:  document.getElementById('f-worktype').value,
+      location:  'London',
+      ote:       'Not disclosed',
+      datePosted: new Date().toISOString().split('T')[0],
+      repvueScore: null, repvueLabel: 'Not checked', repvueUrl: null,
+      employees: 'Unknown',
+      tags,
+      fitScore:  5,
+      fitNote:   note || 'Added by Jack — treat as strong positive signal.',
+      selfAdded: true
+    };
+
+    manualJobs.push(job);
+    saveManualJobs();
+    // Mark as interested automatically since Jack added it
+    if (!feedback[id]) feedback[id] = { status: 'interested', comment: note, applied: false };
+    saveFeedback();
+    closeAddModal();
+    renderAll();
+  }
+
+  function deleteManualJob(id) {
+    if (!confirm('Remove this role from the dashboard?')) return;
+    manualJobs = manualJobs.filter(j => j.id !== id);
+    saveManualJobs();
+    renderAll();
+  }
 
   function loadFeedback() {
     try { feedback = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -384,7 +500,8 @@
     const stateClass = [
       isInterested ? 'state-interested' : '',
       isNotInterested ? 'state-not-interested show-hidden' : '',
-      isApplied ? 'state-applied' : ''
+      isApplied ? 'state-applied' : '',
+      j.selfAdded ? 'self-added' : ''
     ].join(' ').trim();
 
     const dismissedBanner = isNotInterested ? `
@@ -401,8 +518,9 @@
             <div class="card-company">${j.company}</div>
           </div>
           <div class="card-right">
-            <span class="fit-badge">${fitLabel(j.fitScore)}</span>
+            ${j.selfAdded ? '<span class="self-added-badge">⭐ Self-added</span>' : `<span class="fit-badge">${fitLabel(j.fitScore)}</span>`}
             <span class="employees-badge">👥 ${j.employees}</span>
+            ${j.selfAdded ? `<button class="btn-delete-manual" onclick="deleteManualJob('${j.id}')">✕ Remove</button>` : ''}
           </div>
         </div>
 
@@ -450,7 +568,7 @@
   }
 
   function rerenderCard(id) {
-    const job = allJobs.find(j => j.id === id);
+    const job = getDisplayJobs().find(j => j.id === id);
     if (!job) return;
     const el = document.getElementById(`card-${id}`);
     if (!el) return;
@@ -460,7 +578,7 @@
 
   function renderAll() {
     const grid = document.getElementById('jobsGrid');
-    grid.innerHTML = allJobs.map(buildCard).join('');
+    grid.innerHTML = getDisplayJobs().map(buildCard).join('');
     applyFilterToCards();
     updateStats();
     updateActiveCount();
@@ -493,15 +611,15 @@
 
   // ── Stats ──────────────────────────────────────────────────
   function updateStats() {
-    const total = allJobs.length;
-    const interested = allJobs.filter(j => getFeedback(j.id).status === 'interested').length;
-    const dismissed = allJobs.filter(j => getFeedback(j.id).status === 'not-interested').length;
-    const pending = allJobs.filter(j => !getFeedback(j.id).status).length;
-
-    const applied = allJobs.filter(j => getFeedback(j.id).applied).length;
+    const jobs = getDisplayJobs();
+    const total = jobs.length;
+    const interested = jobs.filter(j => getFeedback(j.id).status === 'interested').length;
+    const dismissed = jobs.filter(j => getFeedback(j.id).status === 'not-interested').length;
+    const pending = jobs.filter(j => !getFeedback(j.id).status).length;
+    const applied = jobs.filter(j => getFeedback(j.id).applied).length;
 
     document.getElementById('statTotal').textContent = total;
-    document.getElementById('statStrong').textContent = allJobs.filter(j => j.fitScore === 5).length;
+    document.getElementById('statStrong').textContent = jobs.filter(j => j.fitScore === 5).length;
     document.getElementById('statInterested').textContent = interested;
     document.getElementById('statDismissed').textContent = dismissed;
     document.getElementById('statPending').textContent = pending;
@@ -509,7 +627,7 @@
   }
 
   function updateActiveCount() {
-    const active = allJobs.filter(j => getFeedback(j.id).status !== 'not-interested').length;
+    const active = getDisplayJobs().filter(j => getFeedback(j.id).status !== 'not-interested').length;
     document.getElementById('jobCount').textContent = active;
   }
 
@@ -524,13 +642,26 @@
   function exportFeedback() {
     const summary = {
       exportedAt: new Date().toISOString().split('T')[0],
+      selfAdded: [],
       applied: [],
       interested: [],
       notInterested: [],
       pending: []
     };
 
-    allJobs.forEach(j => {
+    // Self-added jobs are the strongest signal — Jack found these himself
+    manualJobs.forEach(j => {
+      const fb = getFeedback(j.id);
+      summary.selfAdded.push({
+        id: j.id, title: j.title, company: j.company,
+        tags: j.tags, workType: j.workType,
+        applied: !!fb.applied,
+        comment: fb.comment || null,
+        note: j.fitNote || null
+      });
+    });
+
+    getDisplayJobs().forEach(j => {
       const fb = getFeedback(j.id);
       const entry = {
         id: j.id,
@@ -549,6 +680,15 @@
 
     // Build plain-language summary for the AI
     let aiSummary = '## Jack\'s Feedback Summary\n\n';
+    if (summary.selfAdded.length) {
+      aiSummary += '### ⭐ SELF-ADDED (strongest signal — Jack found these himself):\n';
+      summary.selfAdded.forEach(e => {
+        aiSummary += `- **${e.title}** at ${e.company} (tags: ${e.tags.join(', ')})`;
+        if (e.note) aiSummary += ` — "${e.note}"`;
+        aiSummary += '\n';
+      });
+      aiSummary += '→ Actively search for MORE roles at these companies and with these tags/sectors.\n\n';
+    }
     if (summary.interested.length) {
       aiSummary += '### Interested in:\n';
       summary.interested.forEach(e => {
@@ -582,6 +722,7 @@
   // ── Init ──────────────────────────────────────────────────
   async function init() {
     loadFeedback();
+    loadManualJobs();
     const data = await loadData();
     // Ensure each job has an id
     allJobs = data.jobs.map((j, i) => ({ ...j, id: j.id || `job-${i}` }));
@@ -600,5 +741,45 @@
 
   init();
 </script>
+<!-- Add a role modal -->
+<div class="modal-overlay" id="addModal" onclick="if(event.target===this)closeAddModal()">
+  <div class="modal">
+    <h2>➕ Add a role you found</h2>
+    <p>Jack found this himself — it'll be used as a strong signal for future searches.</p>
+    <div class="form-row">
+      <label class="form-label">Job title *</label>
+      <input class="form-input" id="f-title" placeholder="e.g. Enterprise Sales Director">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Company *</label>
+      <input class="form-input" id="f-company" placeholder="e.g. Cloudflare">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Link to job posting</label>
+      <input class="form-input" id="f-link" placeholder="https://...">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Work type</label>
+      <select class="form-select" id="f-worktype">
+        <option value="Remote">Remote</option>
+        <option value="Hybrid" selected>Hybrid</option>
+        <option value="Onsite">Onsite</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Tags (comma-separated)</label>
+      <input class="form-input" id="f-tags" placeholder="e.g. SASE, Zero Trust, Security">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Why does this look good?</label>
+      <input class="form-input" id="f-note" placeholder="e.g. Great SASE fit, heard good things about culture">
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="btn-add-submit" onclick="submitAddForm()">Add role</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
