@@ -124,6 +124,106 @@
   }
   .job-card.archived:hover { opacity: 0.85; }
 
+  /* ── Applied / Pipeline tab ── */
+  .pipeline-card {
+    background: #1a1f2e; border: 1px solid #2d3748;
+    border-radius: 14px; padding: 24px;
+    margin-bottom: 14px; transition: border-color 0.15s;
+  }
+  .pipeline-card:hover { border-color: #4a5568; }
+  .pipeline-card.stage-offer { border-color: #48bb78; }
+  .pipeline-card.stage-final { border-color: #ed8936; }
+
+  .pipeline-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 20px; gap: 16px;
+  }
+  .pipeline-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .pipeline-company { font-size: 13px; color: #63b3ed; margin-top: 3px; font-weight: 500; }
+
+  /* Stage progress track */
+  .stage-track {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px;
+  }
+  .stage-step {
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; flex-shrink: 0; min-width: 80px;
+    position: relative;
+  }
+  .stage-step:not(:last-child)::after {
+    content: ''; position: absolute;
+    top: 14px; left: 50%; width: 100%;
+    height: 2px; background: #2d3748; z-index: 0;
+  }
+  .stage-step.done:not(:last-child)::after,
+  .stage-step.current:not(:last-child)::after { background: #2b6cb0; }
+
+  .stage-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid #2d3748; background: #0f1117;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; position: relative; z-index: 1;
+    transition: all 0.15s;
+  }
+  .stage-step.done .stage-dot { background: #2b6cb0; border-color: #2b6cb0; color: #fff; }
+  .stage-step.current .stage-dot { background: #63b3ed; border-color: #63b3ed; color: #fff; box-shadow: 0 0 0 4px rgba(99,179,237,0.2); }
+  .stage-step:hover .stage-dot { border-color: #63b3ed; }
+  .stage-step.offer-stage.current .stage-dot { background: #48bb78; border-color: #48bb78; box-shadow: 0 0 0 4px rgba(72,187,120,0.2); }
+
+  .stage-label {
+    font-size: 10px; color: #718096; margin-top: 6px; text-align: center;
+    line-height: 1.2; white-space: nowrap;
+  }
+  .stage-step.current .stage-label { color: #63b3ed; font-weight: 600; }
+  .stage-step.done .stage-label { color: #a0aec0; }
+  .stage-step.offer-stage.current .stage-label { color: #48bb78; }
+
+  /* Applied fields */
+  .applied-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .applied-fields { grid-template-columns: 1fr; } }
+
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-group.full-width { grid-column: 1 / -1; }
+  .field-label {
+    font-size: 11px; color: #718096; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600;
+  }
+  .field-input {
+    background: #0f1117; border: 1px solid #2d3748; border-radius: 8px;
+    color: #e2e8f0; padding: 9px 12px; font-size: 13px; font-family: inherit;
+    transition: border-color 0.15s; width: 100%;
+  }
+  .field-input:focus { outline: none; border-color: #4a5568; }
+  .field-textarea {
+    background: #0f1117; border: 1px solid #2d3748; border-radius: 8px;
+    color: #e2e8f0; padding: 9px 12px; font-size: 13px; font-family: inherit;
+    transition: border-color 0.15s; width: 100%; resize: vertical; min-height: 90px; line-height: 1.5;
+  }
+  .field-textarea:focus { outline: none; border-color: #4a5568; }
+  .field-textarea::placeholder, .field-input::placeholder { color: #4a5568; }
+
+  .pipeline-actions {
+    display: flex; gap: 10px; align-items: center;
+    padding-top: 14px; border-top: 1px solid #2d3748;
+  }
+  .btn-view-role {
+    background: #2b6cb0; color: #fff; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-decoration: none; display: inline-block;
+  }
+  .btn-view-role:hover { background: #2c5282; }
+  .btn-move-archive {
+    background: transparent; border: 1px solid #4a5568; color: #718096;
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-move-archive:hover { border-color: #fc8181; color: #fc8181; }
+
+  .no-applied {
+    text-align: center; color: #718096; padding: 60px 20px; font-size: 14px;
+  }
+  .no-applied strong { display: block; font-size: 18px; margin-bottom: 8px; color: #a0aec0; }
+
   .stale-badge {
     font-size: 11px; background: #2d3748; color: #718096;
     padding: 2px 8px; border-radius: 6px; font-weight: 600;
@@ -324,6 +424,9 @@
   <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">
     Active roles <span class="tab-count" id="tc-active">—</span>
   </button>
+  <button class="tab-btn" id="tab-applied" onclick="switchTab('applied')">
+    Applied <span class="tab-count" id="tc-applied">—</span>
+  </button>
   <button class="tab-btn" id="tab-archive" onclick="switchTab('archive')">
     Archive <span class="tab-count" id="tc-archive">—</span>
   </button>
@@ -362,14 +465,85 @@
 
 <script>
   // ── Storage keys ───────────────────────────────────────────
-  const FEEDBACK_KEY = 'jack_jobs_feedback';
-  const MANUAL_KEY   = 'jack_manual_jobs';
-  const SEEN_KEY     = 'jack_seen_jobs'; // persists all jobs ever shown
+  const FEEDBACK_KEY  = 'jack_jobs_feedback';
+  const MANUAL_KEY    = 'jack_manual_jobs';
+  const SEEN_KEY      = 'jack_seen_jobs';
+  const PIPELINE_KEY  = 'jack_pipeline_data'; // { jobId: { stage, ote, daysInOffice, location, interviewNotes, potentialQuestions } }
+
+  // ── Pipeline stages ────────────────────────────────────────
+  const STAGES = [
+    { id: 'applied',        label: 'Applied',        icon: '📨' },
+    { id: 'recruiter-call', label: 'Recruiter Call',  icon: '📞' },
+    { id: 'stage-1',        label: 'Stage 1',         icon: '1' },
+    { id: 'stage-2',        label: 'Stage 2',         icon: '2' },
+    { id: 'stage-3',        label: 'Stage 3',         icon: '3' },
+    { id: 'stage-4',        label: 'Stage 4',         icon: '4' },
+    { id: 'stage-5',        label: 'Stage 5',         icon: '5' },
+    { id: 'final-round',    label: 'Final Round',     icon: '🏆' },
+    { id: 'offer',          label: 'Offer 🎉',        icon: '✓',  isOffer: true },
+  ];
+
+  // ── Pre-populated interview questions per company ──────────
+  const INTERVIEW_QUESTIONS = {
+    'cato-networks-regional-sales-director-uk': `Cato Networks — likely interview questions (from Glassdoor & role context):
+• Walk me through your most significant displacement deal. How did you make the case for replacing existing network architecture?
+• How do you sell SASE differently to a CISO vs. a network/infrastructure team?
+• Cato is pre-IPO at a $4.8B valuation — what excites you about joining at this stage, and how does it change how you'd approach territory?
+• How do you handle a prospect who is mid-contract with Zscaler or Palo Alto?
+• Describe your territory planning approach for a greenfield UK enterprise market.
+• Walk me through a MEDDPICC deal from qualification to close. Where did it nearly fall apart?
+• What's your 30/60/90-day plan if you join as UK Regional Sales Director?
+• How do you build relationships at CISO/CTO level in accounts with no existing champion?
+
+Glassdoor reviews: glassdoor.com/Interview/Cato-Networks-Interview-Questions-E2185497.htm`,
+
+    'semgrep-rvp-sales-emea': `Semgrep — likely interview questions (from Glassdoor & RVP EMEA context):
+• How would you build an EMEA sales team from zero? What does your first 90 days look like?
+• Semgrep sells to both security teams and engineering teams — how do you navigate dual buyer personas in the same account?
+• AppSec is still a developing category for many enterprises. How do you create urgency in a prospect who doesn't feel the pain yet?
+• Walk me through a deal where you had to align security, engineering, and procurement across a complex buying committee.
+• How do you set realistic quota targets for a team operating in an early-stage EMEA motion with a thin playbook?
+• What metrics would you use to measure EMEA team health and trajectory in Year 1?
+• How do you sell into developer-led organisations vs. traditional top-down enterprise?
+• The EMEA attainment rate is 37% — how do you diagnose whether that's a territory, product, or rep execution issue?
+
+Glassdoor reviews: glassdoor.com/Interview/Semgrep-Interview-Questions-E2853202.htm`,
+
+    'torq-regional-sales-manager-emea': `Torq — likely interview questions (from Glassdoor & EMEA RSM context):
+• How do you sell AI-native SOC automation to a security team that's sceptical of replacing manual analyst workflows?
+• Walk me through a deal where you displaced a legacy SIEM or SOAR platform. What was the hardest objection to overcome?
+• Torq explicitly calls for MEDDPICC — give me a specific example of how you've applied it on a complex, multi-stakeholder security deal.
+• AE attainment at Torq is 15-19% — how would you diagnose and fix underperformance in your team?
+• How do you articulate ROI for a SecOps automation platform to a CFO who only cares about headcount reduction?
+• Torq has had 300% revenue growth — how do you maintain quality of hire and culture when scaling fast?
+• How do you build pipeline in a category buyers aren't actively searching for yet?
+
+Glassdoor reviews: glassdoor.com/Interview/Torq-Interview-Questions-E7415271.htm`,
+
+    'newrelic-director-enterprise-sales-uki-nordics': `New Relic — likely interview questions (Director, UKI & Nordics context):
+• New Relic went private with Francisco Partners in 2023 and has restructured significantly. How do you lead a team through organisational change and maintain momentum?
+• How do you compete against Datadog in enterprise accounts where they've established strong developer adoption?
+• Walk me through your approach to managing a multi-country territory — UKI and Nordics are very different markets.
+• The role is primarily expansion and retention of existing customers. How does your enterprise sales motion shift from net-new to expansion?
+• How do you rebuild a team's confidence and drive after a period of disruption?
+• How do you build a business case for observability investment with a CTO who says "we already have monitoring"?
+• What's your experience coaching AEs to sell at Director/VP level in large enterprise accounts?`,
+
+    'infoblox-senior-director-regional-sales-london': `Infoblox — likely interview questions (Senior Director context):
+• DNS as a security vector is still underappreciated — how do you make the case for DNS security to a CISO who doesn't see it as a priority?
+• Walk me through how you sell security infrastructure when the IT/network team is the buyer but the CISO controls the budget.
+• Infoblox is PE-backed by Vista Equity. How do you operate in a cost-discipline, margin-focused environment while still driving top-line growth?
+• How do you approach accounts where a competitor like Cisco (DNA Center) or Solarwinds is already entrenched?
+• Infoblox has two UK Director-level roles open simultaneously — what does that signal to you about the territory opportunity?
+• How do you prioritise time across a large number of existing accounts vs. net-new hunting?
+• What's your view on the BloxOne SASE play — how does it extend the Infoblox conversation with existing DDI customers?`
+  };
 
   // ── State ──────────────────────────────────────────────────
-  let seenJobs  = [];   // all jobs ever loaded (source of truth for job list)
+  let seenJobs   = [];
   let manualJobs = [];
-  let feedback  = {};
+  let feedback   = {};
+  let pipeline   = {}; // { jobId: { stage, ote, daysInOffice, location, interviewNotes, potentialQuestions } }
   let currentTab = 'active';
   let activeFilter = 'all';
 
@@ -460,6 +634,33 @@
     renderAll();
   }
 
+  // ── Pipeline data ──────────────────────────────────────────
+  function loadPipeline() {
+    try { pipeline = JSON.parse(localStorage.getItem(PIPELINE_KEY) || '{}'); }
+    catch { pipeline = {}; }
+  }
+
+  function savePipeline() { localStorage.setItem(PIPELINE_KEY, JSON.stringify(pipeline)); }
+
+  function getPipeline(id) {
+    if (!pipeline[id]) {
+      const defaultQ = INTERVIEW_QUESTIONS[id] || '';
+      pipeline[id] = { stage: 'applied', ote: '', daysInOffice: '', location: '', interviewNotes: '', potentialQuestions: defaultQ };
+    }
+    return pipeline[id];
+  }
+
+  function setStage(id, stageId) {
+    getPipeline(id).stage = stageId;
+    savePipeline();
+    rerenderPipelineCard(id);
+  }
+
+  function setPipelineField(id, field, value) {
+    getPipeline(id)[field] = value;
+    savePipeline();
+  }
+
   // ── Feedback ───────────────────────────────────────────────
   function loadFeedback() {
     try { feedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || '{}'); }
@@ -517,6 +718,7 @@
   function switchTab(tab) {
     currentTab = tab;
     document.getElementById('tab-active').classList.toggle('active', tab === 'active');
+    document.getElementById('tab-applied').classList.toggle('active', tab === 'applied');
     document.getElementById('tab-archive').classList.toggle('active', tab === 'archive');
     document.getElementById('filtersRow').style.display = tab === 'active' ? '' : 'none';
     renderAll();
@@ -527,6 +729,10 @@
 
   function getActiveJobs() {
     return getAllJobs().filter(j => getFeedback(j.id).status !== 'not-interested');
+  }
+
+  function getAppliedJobs() {
+    return getAllJobs().filter(j => getFeedback(j.id).applied && getFeedback(j.id).status !== 'not-interested');
   }
 
   function getArchivedJobs() {
@@ -612,6 +818,78 @@
       </div>`;
   }
 
+  function buildPipelineCard(j) {
+    const p = getPipeline(j.id);
+    const currentStageIdx = STAGES.findIndex(s => s.id === p.stage);
+    const isOffer = p.stage === 'offer';
+
+    const stageTrack = STAGES.map((s, i) => {
+      const isDone    = i < currentStageIdx;
+      const isCurrent = i === currentStageIdx;
+      const cls = [isDone ? 'done' : '', isCurrent ? 'current' : '', s.isOffer ? 'offer-stage' : ''].filter(Boolean).join(' ');
+      return `<div class="stage-step ${cls}" onclick="setStage('${j.id}', '${s.id}')" title="${s.label}">
+        <div class="stage-dot">${isDone ? '✓' : s.icon}</div>
+        <div class="stage-label">${s.label}</div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="pipeline-card ${isOffer ? 'stage-offer' : p.stage === 'final-round' ? 'stage-final' : ''}" id="pipeline-${j.id}">
+        <div class="pipeline-header">
+          <div>
+            <div class="pipeline-title">${j.title}</div>
+            <div class="pipeline-company">${j.company}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+            <span class="employees-badge">👥 ${j.employees}</span>
+            ${j.link ? `<a class="btn-view-role" href="${j.link}" target="_blank">View role ↗</a>` : ''}
+          </div>
+        </div>
+
+        <div class="stage-track">${stageTrack}</div>
+
+        <div class="applied-fields">
+          <div class="field-group">
+            <div class="field-label">💰 OTE from Recruiter</div>
+            <input class="field-input" value="${p.ote || ''}" placeholder="e.g. £220k base + £220k variable"
+              oninput="setPipelineField('${j.id}', 'ote', this.value)">
+          </div>
+          <div class="field-group">
+            <div class="field-label">🏢 Days in Office</div>
+            <input class="field-input" value="${p.daysInOffice || ''}" placeholder="e.g. 2 days / week"
+              oninput="setPipelineField('${j.id}', 'daysInOffice', this.value)">
+          </div>
+          <div class="field-group">
+            <div class="field-label">📍 Office Location</div>
+            <input class="field-input" value="${p.location || ''}" placeholder="e.g. Shoreditch, London"
+              oninput="setPipelineField('${j.id}', 'location', this.value)">
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <div class="field-label">📝 Interview Notes</div>
+            <textarea class="field-textarea" placeholder="Notes from each stage — who you met, what was discussed, red/green flags…"
+              oninput="setPipelineField('${j.id}', 'interviewNotes', this.value)">${p.interviewNotes || ''}</textarea>
+          </div>
+          <div class="field-group" style="grid-column:1/-1">
+            <div class="field-label">❓ Potential Interview Questions</div>
+            <textarea class="field-textarea" style="min-height:160px"
+              placeholder="Questions likely to come up based on the role and company…"
+              oninput="setPipelineField('${j.id}', 'potentialQuestions', this.value)">${p.potentialQuestions || ''}</textarea>
+          </div>
+        </div>
+
+        <div class="pipeline-actions">
+          <button class="btn-move-archive" onclick="setStatus('${j.id}', 'not-interested')">👎 Archive this role</button>
+        </div>
+      </div>`;
+  }
+
+  function rerenderPipelineCard(id) {
+    const job = getAllJobs().find(j => j.id === id);
+    if (!job) return;
+    const el = document.getElementById(`pipeline-${id}`);
+    if (el) el.outerHTML = buildPipelineCard(job);
+  }
+
   function buildArchiveCard(j) {
     const fb = getFeedback(j.id);
     const tags = j.tags.map(t => `<span class="tag">${t}</span>`).join('');
@@ -660,19 +938,24 @@
 
     if (currentTab === 'active') {
       const jobs = getActiveJobs();
+      grid.innerHTML = jobs.length === 0
+        ? '<div class="no-results">No active roles — check the Archive tab.</div>'
+        : jobs.map(buildActiveCard).join('');
+      if (jobs.length > 0) applyFilterToCards();
+
+    } else if (currentTab === 'applied') {
+      const jobs = getAppliedJobs();
       if (jobs.length === 0) {
-        grid.innerHTML = '<div class="no-results">No active roles — check the Archive tab.</div>';
+        grid.innerHTML = `<div class="no-applied"><strong>No applied roles yet</strong>Check the "Applied" checkbox on any active role to track it here.</div>`;
       } else {
-        grid.innerHTML = jobs.map(buildActiveCard).join('');
-        applyFilterToCards();
+        grid.innerHTML = jobs.map(buildPipelineCard).join('');
       }
+
     } else {
       const jobs = getArchivedJobs();
-      if (jobs.length === 0) {
-        grid.innerHTML = '<div class="archive-empty">No archived roles yet.<br>Use "👎 Archive" on any role to move it here.</div>';
-      } else {
-        grid.innerHTML = jobs.map(buildArchiveCard).join('');
-      }
+      grid.innerHTML = jobs.length === 0
+        ? '<div class="archive-empty">No archived roles yet.<br>Use "👎 Archive" on any role to move it here.</div>'
+        : jobs.map(buildArchiveCard).join('');
     }
 
     updateStats();
@@ -715,6 +998,7 @@
 
   function updateTabCounts() {
     document.getElementById('tc-active').textContent  = getActiveJobs().length;
+    document.getElementById('tc-applied').textContent = getAppliedJobs().length;
     document.getElementById('tc-archive').textContent = getArchivedJobs().length;
   }
 
@@ -768,6 +1052,7 @@
     loadFeedback();
     loadManualJobs();
     loadSeenJobs();
+    loadPipeline();
 
     const data = await loadData();
     const freshJobs = data.jobs.map((j, i) => ({ ...j, id: j.id || `job-${i}` }));
