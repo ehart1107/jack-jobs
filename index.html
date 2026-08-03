@@ -45,13 +45,29 @@
   }
   .btn-export:hover { background: #4a5568; }
 
-  .btn-show-hidden {
-    background: transparent; border: 1px solid #4a5568;
-    color: #718096; border-radius: 8px;
-    padding: 7px 14px; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s;
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; gap: 0;
+    border-bottom: 1px solid #2d3748;
+    padding: 0 40px;
+    background: #0f1117;
   }
-  .btn-show-hidden:hover { color: #e2e8f0; border-color: #718096; }
+  .tab-btn {
+    background: transparent; border: none;
+    color: #718096; font-size: 14px; font-weight: 600;
+    padding: 14px 24px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: all 0.15s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tab-btn:hover { color: #a0aec0; }
+  .tab-btn.active { color: #fff; border-bottom-color: #63b3ed; }
+  .tab-count {
+    background: #2d3748; border-radius: 10px;
+    padding: 2px 8px; font-size: 11px; font-weight: 700;
+    color: #a0aec0;
+  }
+  .tab-btn.active .tab-count { background: #2b6cb0; color: #fff; }
 
   main { padding: 32px 40px; max-width: 1200px; margin: 0 auto; }
 
@@ -96,13 +112,22 @@
   .job-card.fit-3 { border-left: 3px solid #ed8936; }
   .job-card.fit-2 { border-left: 3px solid #718096; }
 
-  /* Interest states */
   .job-card.state-interested { border-color: #276749; background: #1a2e22; }
-  .job-card.state-interested.fit-5 { border-left-color: #48bb78; }
-  .job-card.state-not-interested {
-    opacity: 0.4; pointer-events: none;
+  .job-card.state-applied { border-color: #276749; }
+  .job-card.state-applied .card-title::after { content: ' ✅'; font-size: 13px; }
+
+  /* Archive card style */
+  .job-card.archived {
+    opacity: 0.6;
+    background: #141820;
+    border-left-color: #4a5568 !important;
   }
-  .job-card.state-not-interested.show-hidden { opacity: 1; pointer-events: auto; background: #1a1520; border-color: #553c3c; }
+  .job-card.archived:hover { opacity: 0.85; }
+
+  .stale-badge {
+    font-size: 11px; background: #2d3748; color: #718096;
+    padding: 2px 8px; border-radius: 6px; font-weight: 600;
+  }
 
   .card-top {
     display: flex; justify-content: space-between;
@@ -133,12 +158,10 @@
     border-top: 1px solid #2d3748; padding-top: 10px; margin-top: 4px;
   }
 
-  /* Actions row */
   .card-actions {
     display: flex; gap: 10px; margin-top: 14px;
     align-items: center; justify-content: space-between; flex-wrap: wrap;
   }
-
   .card-actions-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
   .btn-apply {
@@ -161,15 +184,11 @@
   .ote-value { font-size: 12px; color: #f6e05e; font-weight: 600; }
   .ote-nd { color: #718096; }
 
-  /* ── Feedback section ── */
+  /* Feedback section */
   .feedback-section {
-    margin-top: 16px;
-    border-top: 1px solid #2d3748;
-    padding-top: 14px;
+    margin-top: 16px; border-top: 1px solid #2d3748; padding-top: 14px;
   }
-
   .interest-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
-
   .btn-interest {
     border: 1px solid #2d3748; background: #1a1f2e;
     border-radius: 8px; padding: 7px 16px;
@@ -198,50 +217,33 @@
     text-transform: uppercase; letter-spacing: 0.4px;
   }
 
-  /* Applied checkbox */
-  .applied-row {
-    display: flex; align-items: center; gap: 8px;
-    margin-top: 10px;
-  }
-  .applied-checkbox {
-    width: 16px; height: 16px; cursor: pointer; accent-color: #48bb78;
-  }
+  .applied-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .applied-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #48bb78; }
   .applied-label { font-size: 13px; color: #a0aec0; cursor: pointer; user-select: none; }
   .applied-badge {
     display: inline-block; background: #22543d; color: #68d391;
     font-size: 11px; font-weight: 700; padding: 2px 8px;
     border-radius: 6px; margin-left: 8px; letter-spacing: 0.3px;
   }
-  .job-card.state-applied { border-color: #276749; }
-  .job-card.state-applied .card-title::after {
-    content: ' ✅'; font-size: 13px;
-  }
 
-  .dismissed-banner {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 12px; background: #4a1c1c; border-radius: 8px;
-    margin-top: 8px; font-size: 12px; color: #fc8181;
+  /* Archive actions */
+  .archive-actions {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid #2d3748;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   }
-  .btn-undo {
-    background: transparent; border: 1px solid #fc8181;
-    color: #fc8181; border-radius: 6px; padding: 3px 10px;
-    font-size: 11px; cursor: pointer; transition: all 0.15s;
+  .dismissed-reason { font-size: 12px; color: #718096; font-style: italic; }
+  .btn-restore {
+    background: transparent; border: 1px solid #4a5568;
+    color: #a0aec0; border-radius: 8px; padding: 7px 16px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
   }
-  .btn-undo:hover { background: #4a1c1c; }
+  .btn-restore:hover { border-color: #63b3ed; color: #63b3ed; }
 
-  .hidden-divider {
-    text-align: center; padding: 20px;
-    font-size: 12px; color: #4a5568;
-    border-top: 1px dashed #2d3748; margin-top: 8px;
-  }
-
-  .no-results { text-align: center; color: #718096; padding: 60px 20px; font-size: 14px; }
-
-  /* Self-added badge */
+  /* Self-added */
   .self-added-badge {
     font-size: 11px; font-weight: 700; padding: 2px 8px;
-    border-radius: 6px; background: #44337a; color: #b794f4;
-    letter-spacing: 0.3px;
+    border-radius: 6px; background: #44337a; color: #b794f4; letter-spacing: 0.3px;
   }
   .job-card.self-added { border-left: 3px solid #805ad5; }
   .btn-delete-manual {
@@ -250,6 +252,9 @@
     font-size: 11px; cursor: pointer; transition: all 0.15s;
   }
   .btn-delete-manual:hover { border-color: #fc8181; color: #fc8181; }
+
+  .no-results { text-align: center; color: #718096; padding: 60px 20px; font-size: 14px; }
+  .archive-empty { text-align: center; color: #4a5568; padding: 60px 20px; font-size: 14px; }
 
   /* Add role modal */
   .modal-overlay {
@@ -294,6 +299,7 @@
 
   @media (max-width: 640px) {
     header, main { padding: 20px; }
+    .tabs { padding: 0 20px; }
     .card-top { flex-direction: column; }
     .card-right { flex-direction: row; align-items: center; }
   }
@@ -309,23 +315,31 @@
   <div class="header-actions">
     <div class="meta-pill">Updated: <span id="lastUpdated">—</span></div>
     <div class="meta-pill"><span id="jobCount">—</span> active roles</div>
-    <button class="btn-show-hidden" id="toggleHidden" onclick="toggleHidden()">Show dismissed</button>
     <button class="btn-export" style="background:#553c9a;border-color:#805ad5;color:#e9d8fd;" onclick="openAddModal()">➕ Add a role</button>
     <button class="btn-export" onclick="exportFeedback()">⬇ Export feedback</button>
   </div>
 </header>
 
+<div class="tabs">
+  <button class="tab-btn active" id="tab-active" onclick="switchTab('active')">
+    Active roles <span class="tab-count" id="tc-active">—</span>
+  </button>
+  <button class="tab-btn" id="tab-archive" onclick="switchTab('archive')">
+    Archive <span class="tab-count" id="tc-archive">—</span>
+  </button>
+</div>
+
 <main>
-  <div class="stats">
+  <div class="stats" id="statsRow">
     <div class="stat-card"><div class="value" id="statTotal">—</div><div class="label">Total Roles</div></div>
     <div class="stat-card"><div class="value" id="statStrong">—</div><div class="label">Strong Matches</div></div>
     <div class="stat-card"><div class="value" id="statInterested">—</div><div class="label">👍 Interested</div></div>
-    <div class="stat-card"><div class="value" id="statDismissed">—</div><div class="label">👎 Dismissed</div></div>
+    <div class="stat-card"><div class="value" id="statDismissed">—</div><div class="label">👎 Archived</div></div>
     <div class="stat-card"><div class="value" id="statPending">—</div><div class="label">Not reviewed</div></div>
     <div class="stat-card"><div class="value" id="statApplied">—</div><div class="label">✅ Applied</div></div>
   </div>
 
-  <div class="filters">
+  <div class="filters" id="filtersRow">
     <span>Filter:</span>
     <button class="filter-btn active" data-filter="all">All active</button>
     <button class="filter-btn" data-filter="fit-5">⭐ Strong Match</button>
@@ -343,21 +357,44 @@
 </main>
 
 <footer>
-  Built by Cowork · Refreshed daily · Feedback saves automatically in your browser
+  Built by Cowork · Refreshed daily · Roles persist until you archive them
 </footer>
 
 <script>
+  // ── Storage keys ───────────────────────────────────────────
+  const FEEDBACK_KEY = 'jack_jobs_feedback';
+  const MANUAL_KEY   = 'jack_manual_jobs';
+  const SEEN_KEY     = 'jack_seen_jobs'; // persists all jobs ever shown
+
   // ── State ──────────────────────────────────────────────────
-  let allJobs = [];
+  let seenJobs  = [];   // all jobs ever loaded (source of truth for job list)
   let manualJobs = [];
-  let feedback = {}; // { jobId: { status, comment, applied } }
-  let showHidden = false;
+  let feedback  = {};
+  let currentTab = 'active';
   let activeFilter = 'all';
 
-  const STORAGE_KEY = 'jack_jobs_feedback';
-  const MANUAL_KEY  = 'jack_manual_jobs';
+  // ── Seen jobs persistence ──────────────────────────────────
+  function loadSeenJobs() {
+    try { seenJobs = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); }
+    catch { seenJobs = []; }
+  }
 
-  function getDisplayJobs() { return [...allJobs, ...manualJobs]; }
+  function saveSeenJobs() {
+    localStorage.setItem(SEEN_KEY, JSON.stringify(seenJobs));
+  }
+
+  // Merge freshly loaded jobs into seenJobs (new ones appended, existing untouched)
+  function mergeIntoSeen(freshJobs) {
+    const existingIds = new Set(seenJobs.map(j => j.id));
+    let added = 0;
+    freshJobs.forEach(j => {
+      if (!existingIds.has(j.id)) {
+        seenJobs.push(j);
+        added++;
+      }
+    });
+    if (added > 0) saveSeenJobs();
+  }
 
   // ── Manual jobs ────────────────────────────────────────────
   function loadManualJobs() {
@@ -408,7 +445,6 @@
 
     manualJobs.push(job);
     saveManualJobs();
-    // Mark as interested automatically since Jack added it
     if (!feedback[id]) feedback[id] = { status: 'interested', comment: note, applied: false };
     saveFeedback();
     closeAddModal();
@@ -419,16 +455,19 @@
     if (!confirm('Remove this role from the dashboard?')) return;
     manualJobs = manualJobs.filter(j => j.id !== id);
     saveManualJobs();
+    seenJobs = seenJobs.filter(j => j.id !== id);
+    saveSeenJobs();
     renderAll();
   }
 
+  // ── Feedback ───────────────────────────────────────────────
   function loadFeedback() {
-    try { feedback = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    try { feedback = JSON.parse(localStorage.getItem(FEEDBACK_KEY) || '{}'); }
     catch { feedback = {}; }
   }
 
   function saveFeedback() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(feedback));
+    localStorage.setItem(FEEDBACK_KEY, JSON.stringify(feedback));
     updateStats();
   }
 
@@ -445,11 +484,16 @@
 
   function setStatus(id, status) {
     if (!feedback[id]) feedback[id] = { status: null, comment: '' };
-    // Toggle off if clicking same button
     feedback[id].status = feedback[id].status === status ? null : status;
     saveFeedback();
-    rerenderCard(id);
-    updateActiveCount();
+    renderAll(); // full re-render since tab membership may change
+  }
+
+  function restoreFromArchive(id) {
+    if (!feedback[id]) feedback[id] = { status: null, comment: '' };
+    feedback[id].status = null;
+    saveFeedback();
+    renderAll();
   }
 
   function setComment(id, comment) {
@@ -461,31 +505,45 @@
   // ── Data ──────────────────────────────────────────────────
   async function loadData() {
     try {
-      const res = await fetch('jobs.json');
+      const res = await fetch('jobs.json?t=' + Date.now());
       if (!res.ok) throw new Error();
       return await res.json();
     } catch { return INLINE_DATA; }
   }
 
-  const INLINE_DATA = {"lastUpdated":"2026-08-02","candidate":"Jack Earl","criteria":"London · Enterprise SaaS / Security / SASE · <2,000 employees · Last 30 days","jobs":[{"id":"cato-rsd-uk","title":"Regional Sales Director, UK","company":"Cato Networks","location":"UK","workType":"Remote","ote":"Not disclosed","datePosted":"2026-07","link":"https://www.catonetworks.com/careers/careers-post/4155673101/regional-sales-director-uk/","repvueScore":83,"repvueLabel":"83 / 100","repvueUrl":"https://www.repvue.com/companies/CatoNetworks","employees":"~1,700","tags":["SASE","Zero Trust","SD-WAN","Security"],"fitScore":5,"fitNote":"Direct match — SASE is Cato's core product, perfectly aligned with Jack's Cisco Meraki/NTT background. Strong quota attainment ratings on RepVue."},{"id":"safe-security-ae","title":"Enterprise Account Executive","company":"Safe Security","location":"London","workType":"Remote","ote":"Not disclosed","datePosted":"2026-07-29","link":"https://jobs.lever.co/safe/bd1da8dd-02f6-41dd-9ac3-f6b4d24065d0","repvueScore":null,"repvueLabel":"Not on RepVue","repvueUrl":null,"employees":"~99","tags":["Cybersecurity","AI","Series C"],"fitScore":5,"fitNote":"Strong fit — AI-driven cyber risk platform, Series C $170M, serves 10% of Fortune 500. Tiny team means real ownership. CISO/CIO selling required."},{"id":"55exec-sase","title":"Enterprise Sales Executive – SASE, SD-WAN & Managed Services","company":"Undisclosed (via 55 Exec Search)","location":"London – Zone 1","workType":"Hybrid","ote":"~£140–160k (£70–80k base + double)","datePosted":"2026-07","link":"https://bebee.com/gb/jobs/enterprise-sales-executive-sase-sd-wan-managed-services-55-exec-search-london-area--theirstack-695804008","repvueScore":null,"repvueLabel":"Company TBC","repvueUrl":null,"employees":"Unknown","tags":["SASE","SD-WAN","Managed Services"],"fitScore":5,"fitNote":"Spec reads like it was written for Jack's exact background. Contact 55 Exec Search directly to identify the company before assessing further."},{"id":"here-fs","title":"Sales Director, Financial Services & Multi-Industry","company":"HERE (formerly OpenFin)","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/hereio/jobs/8042622","repvueScore":null,"repvueLabel":"Not on RepVue","repvueUrl":null,"employees":"115","tags":["Enterprise Browser","Security","FinTech","SaaS"],"fitScore":3,"fitNote":"Enterprise browser with Zero Trust angle. 115 employees, backed by Bain/JPMorgan. Less aligned with networking background — requires FS industry experience."},{"id":"here-gov","title":"Sales Director, Government Sector","company":"HERE (formerly OpenFin)","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/hereio/jobs/8042626","repvueScore":null,"repvueLabel":"Not on RepVue","repvueUrl":null,"employees":"115","tags":["Enterprise Browser","Security","Government","SaaS"],"fitScore":3,"fitNote":"Requires demonstrable UK public sector sales track record — only worth pursuing if Jack has government deal history."},{"id":"here-multi","title":"Sales Director, Multi-Industry","company":"HERE (formerly OpenFin)","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/hereio/jobs/8042634","repvueScore":null,"repvueLabel":"Not on RepVue","repvueUrl":null,"employees":"115","tags":["Enterprise Browser","Security","SaaS"],"fitScore":3,"fitNote":"Most flexible of the HERE roles — selling to airlines, manufacturing, energy. Individual contributor, London hybrid Wed/Thu."},{"id":"here-sme","title":"Sales Director, Multi-Industry SME","company":"HERE (formerly OpenFin)","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/hereio/jobs/8042631","repvueScore":null,"repvueLabel":"Not on RepVue","repvueUrl":null,"employees":"115","tags":["Enterprise Browser","Security","SME","SaaS"],"fitScore":2,"fitNote":"SME focus is a step down from Jack's enterprise experience. Lowest priority of the HERE roles."}]};
+  const INLINE_DATA = {"lastUpdated":"2026-08-02","candidate":"Jack Earl","criteria":"London · Enterprise SaaS / Security / SASE · <2,000 employees · Last 30 days","jobs":[{"id":"cato-networks-regional-sales-director-uk","title":"Regional Sales Director, UK","company":"Cato Networks","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://www.catonetworks.com/careers/careers-post/4155673101/regional-sales-director-uk/","repvueScore":88,"repvueLabel":"88 / 100","repvueUrl":"https://www.repvue.com/companies/CatoNetworks","employees":"~1,500","tags":["SASE","Zero Trust","SD-WAN","Network Security","XDR"],"fitScore":5,"fitNote":"Cato invented the SASE category — the exact technology Jack has spent seven years selling. Displacement of legacy firewall and MPLS is the core motion, perfectly matching his Cisco Meraki background. Pre-IPO at $4.8B valuation with 42% YoY growth."},{"id":"semgrep-rvp-sales-emea","title":"RVP Sales – EMEA","company":"Semgrep","location":"London","workType":"Hybrid","ote":"£300,000 GBP","datePosted":"2026-07","link":"https://jobs.ashbyhq.com/semgrep/f32e279d-dad5-44a7-963c-775f81f089b5","repvueScore":82,"repvueLabel":"82 / 100","repvueUrl":"https://www.repvue.com/companies/Semgrep","employees":"~350","tags":["Developer Security","AppSec","DevSecOps","Series C"],"fitScore":5,"fitNote":"Most senior EMEA commercial role at a Sequoia-backed AppSec company. Jack would build the team from scratch — his headline 0-to-1 achievement. £300k OTE confirmed in the posting."},{"id":"torq-regional-sales-manager-emea","title":"Regional Sales Manager – EMEA","company":"Torq","location":"London","workType":"Remote","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/torq/jobs/6123431004","repvueScore":90,"repvueLabel":"90 / 100","repvueUrl":"https://www.repvue.com/companies/torq","employees":"~400","tags":["AI SOC","SecOps Automation","SOAR","XDR","MEDDPICC"],"fitScore":4,"fitNote":"AI-native SOC automation displacing legacy SIEM/SOAR — classic displacement motion. 300% revenue growth, Series D. Explicitly calls for MEDDPICC practitioners."},{"id":"newrelic-director-enterprise-sales-uki-nordics","title":"Director, Enterprise Sales – UKI & Nordics","company":"New Relic","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://job-boards.greenhouse.io/newrelic/jobs/5271773008","repvueScore":78,"repvueLabel":"78 / 100","repvueUrl":"https://www.repvue.com/companies/NewRelic","employees":"~5,500","tags":["Observability","APM","Monitoring","DevOps"],"fitScore":3,"fitNote":"Step-up Director title with full UKI & Nordics P&L. PE-backed (Francisco Partners) with no IPO narrative — deprioritise unless other options stall."},{"id":"infoblox-senior-director-regional-sales-london","title":"Senior Director, Regional Sales","company":"Infoblox","location":"London","workType":"Hybrid","ote":"Not disclosed","datePosted":"2026-07","link":"https://uk.linkedin.com/jobs/view/senior-director-regional-sales-at-infoblox-4142440001","repvueScore":77,"repvueLabel":"77 / 100","repvueUrl":"https://www.repvue.com/companies/infoblox","employees":"~2,500","tags":["Cybersecurity","DNS Security","DDI","SASE","Network Security"],"fitScore":3,"fitNote":"Network security portfolio overlaps with Jack's background. PE-backed Vista Equity — no growth narrative. Only pursue if priority roles stall."}]};
+
+  // ── Tabs ───────────────────────────────────────────────────
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-active').classList.toggle('active', tab === 'active');
+    document.getElementById('tab-archive').classList.toggle('active', tab === 'archive');
+    document.getElementById('filtersRow').style.display = tab === 'active' ? '' : 'none';
+    renderAll();
+  }
+
+  // ── Derived lists ──────────────────────────────────────────
+  function getAllJobs() { return [...seenJobs, ...manualJobs]; }
+
+  function getActiveJobs() {
+    return getAllJobs().filter(j => getFeedback(j.id).status !== 'not-interested');
+  }
+
+  function getArchivedJobs() {
+    return getAllJobs().filter(j => getFeedback(j.id).status === 'not-interested');
+  }
 
   // ── Render ─────────────────────────────────────────────────
   function fitLabel(s) {
-    return s === 5 ? '⭐ Strong Match' : s === 3 ? 'Moderate' : 'Lower Priority';
+    return s === 5 ? '⭐ Strong Match' : s === 3 ? 'Moderate' : s === 4 ? 'Good Match' : 'Lower Priority';
   }
 
   function wtIcon(wt) { return wt === 'Remote' ? '🏠' : '🏢'; }
 
-  function buildCard(j) {
+  function buildActiveCard(j) {
     const fb = getFeedback(j.id);
-    const isNotInterested = fb.status === 'not-interested';
     const isInterested = fb.status === 'interested';
     const isApplied = !!fb.applied;
-
-    // If not-interested and hidden mode is off, render a collapsed placeholder
-    if (isNotInterested && !showHidden) {
-      return `<div class="job-card fit-${j.fitScore} state-not-interested" id="card-${j.id}" style="display:none"></div>`;
-    }
 
     const repvue = j.repvueScore
       ? `<a class="repvue-link" href="${j.repvueUrl}" target="_blank">RepVue: <span class="score-val">${j.repvueLabel}</span> ↗</a>`
@@ -499,19 +557,13 @@
 
     const stateClass = [
       isInterested ? 'state-interested' : '',
-      isNotInterested ? 'state-not-interested show-hidden' : '',
       isApplied ? 'state-applied' : '',
       j.selfAdded ? 'self-added' : ''
     ].join(' ').trim();
 
-    const dismissedBanner = isNotInterested ? `
-      <div class="dismissed-banner">
-        👎 Dismissed — "${fb.comment || 'no comment'}"
-        <button class="btn-undo" onclick="setStatus('${j.id}', 'not-interested')">Undo</button>
-      </div>` : '';
-
     return `
-      <div class="job-card fit-${j.fitScore} ${stateClass}" id="card-${j.id}" data-id="${j.id}" data-fit="${j.fitScore}" data-worktype="${j.workType}" data-tags="${j.tags.join(',')}">
+      <div class="job-card fit-${j.fitScore} ${stateClass}" id="card-${j.id}"
+           data-id="${j.id}" data-fit="${j.fitScore}" data-worktype="${j.workType}" data-tags="${j.tags.join(',')}">
         <div class="card-top">
           <div>
             <div class="card-title">${j.title}</div>
@@ -523,35 +575,30 @@
             ${j.selfAdded ? `<button class="btn-delete-manual" onclick="deleteManualJob('${j.id}')">✕ Remove</button>` : ''}
           </div>
         </div>
-
         <div class="card-meta">
           <div class="meta-item"><span class="icon">${wtIcon(j.workType)}</span>${j.workType}</div>
           <div class="meta-item"><span class="icon">📍</span>${j.location}</div>
           <div class="meta-item"><span class="icon">📅</span>${j.datePosted}</div>
           <div class="meta-item">${ote}</div>
         </div>
-
         <div class="tags">${tags}</div>
         <div class="fit-note">${j.fitNote}</div>
-
         <div class="card-actions">
           <div class="card-actions-left">
             <a class="btn-apply" href="${j.link}" target="_blank">View & Apply →</a>
             ${repvue}
           </div>
         </div>
-
-        <!-- Feedback -->
         <div class="feedback-section">
           <div class="interest-buttons">
             <button class="btn-interest btn-interested ${isInterested ? 'selected' : ''}"
               onclick="setStatus('${j.id}', 'interested')">👍 Interested</button>
-            <button class="btn-interest btn-not-interested ${isNotInterested ? 'selected' : ''}"
-              onclick="setStatus('${j.id}', 'not-interested')">👎 Not interested</button>
+            <button class="btn-interest btn-not-interested"
+              onclick="setStatus('${j.id}', 'not-interested')">👎 Archive</button>
           </div>
           <div class="feedback-label">Jack's notes</div>
           <textarea class="comment-area" id="comment-${j.id}"
-            placeholder="Why are you interested or not? What's missing? (e.g. 'OTE too low', 'love the SASE angle', 'company too early stage'…)"
+            placeholder="Why are you interested or not? OTE thoughts, culture flags, sector fit…"
             oninput="setComment('${j.id}', this.value)">${fb.comment || ''}</textarea>
           <div class="applied-row">
             <input type="checkbox" class="applied-checkbox" id="applied-${j.id}"
@@ -561,37 +608,86 @@
               Applied${isApplied ? '<span class="applied-badge">✅ Applied</span>' : ''}
             </label>
           </div>
-          ${dismissedBanner}
         </div>
-      </div>
-    `;
+      </div>`;
+  }
+
+  function buildArchiveCard(j) {
+    const fb = getFeedback(j.id);
+    const tags = j.tags.map(t => `<span class="tag">${t}</span>`).join('');
+    const reason = fb.comment ? `"${fb.comment}"` : 'No reason noted';
+
+    return `
+      <div class="job-card fit-${j.fitScore} archived" id="card-${j.id}"
+           data-id="${j.id}">
+        <div class="card-top">
+          <div>
+            <div class="card-title">${j.title}</div>
+            <div class="card-company">${j.company}</div>
+          </div>
+          <div class="card-right">
+            <span class="fit-badge">${fitLabel(j.fitScore)}</span>
+            <span class="employees-badge">👥 ${j.employees}</span>
+          </div>
+        </div>
+        <div class="card-meta">
+          <div class="meta-item"><span class="icon">${wtIcon(j.workType)}</span>${j.workType}</div>
+          <div class="meta-item"><span class="icon">📍</span>${j.location}</div>
+          <div class="meta-item"><span class="icon">📅</span>${j.datePosted}</div>
+        </div>
+        <div class="tags">${tags}</div>
+        <div class="archive-actions">
+          <span class="dismissed-reason">👎 Archived — ${reason}</span>
+          <button class="btn-restore" onclick="restoreFromArchive('${j.id}')">↩ Restore to active</button>
+        </div>
+      </div>`;
   }
 
   function rerenderCard(id) {
-    const job = getDisplayJobs().find(j => j.id === id);
+    const job = getAllJobs().find(j => j.id === id);
     if (!job) return;
     const el = document.getElementById(`card-${id}`);
     if (!el) return;
-    el.outerHTML = buildCard(job);
+    const fb = getFeedback(id);
+    el.outerHTML = fb.status === 'not-interested' && currentTab === 'archive'
+      ? buildArchiveCard(job)
+      : buildActiveCard(job);
     applyFilterToCards();
   }
 
   function renderAll() {
     const grid = document.getElementById('jobsGrid');
-    grid.innerHTML = getDisplayJobs().map(buildCard).join('');
-    applyFilterToCards();
+
+    if (currentTab === 'active') {
+      const jobs = getActiveJobs();
+      if (jobs.length === 0) {
+        grid.innerHTML = '<div class="no-results">No active roles — check the Archive tab.</div>';
+      } else {
+        grid.innerHTML = jobs.map(buildActiveCard).join('');
+        applyFilterToCards();
+      }
+    } else {
+      const jobs = getArchivedJobs();
+      if (jobs.length === 0) {
+        grid.innerHTML = '<div class="archive-empty">No archived roles yet.<br>Use "👎 Archive" on any role to move it here.</div>';
+      } else {
+        grid.innerHTML = jobs.map(buildArchiveCard).join('');
+      }
+    }
+
     updateStats();
+    updateTabCounts();
     updateActiveCount();
   }
 
-  // ── Filtering ──────────────────────────────────────────────
+  // ── Filtering (active tab only) ────────────────────────────
   function applyFilterToCards() {
+    if (currentTab !== 'active') return;
     document.querySelectorAll('.job-card').forEach(card => {
-      if (card.style.display === 'none') return; // already hidden (not-interested, hidden mode)
-      const fit = card.dataset.fit;
-      const wt = card.dataset.worktype;
+      const fit  = card.dataset.fit;
+      const wt   = card.dataset.worktype;
       const tags = (card.dataset.tags || '').toLowerCase();
-      const fb = getFeedback(card.dataset.id);
+      const fb   = getFeedback(card.dataset.id);
 
       let show = true;
       if (activeFilter === 'fit-5') show = fit === '5';
@@ -600,10 +696,7 @@
       else if (activeFilter === 'Hybrid') show = wt === 'Hybrid';
       else if (activeFilter === 'SASE') show = tags.includes('sase') || tags.includes('sd-wan');
       else if (activeFilter === 'Security') show = tags.includes('security') || tags.includes('cybersecurity');
-      else if (activeFilter === 'applied') show = getFeedback(card.dataset.id).applied;
-
-      // Don't show not-interested in any filter unless showHidden
-      if (fb.status === 'not-interested' && !showHidden) show = false;
+      else if (activeFilter === 'applied') show = fb.applied;
 
       card.style.display = show ? '' : 'none';
     });
@@ -611,105 +704,56 @@
 
   // ── Stats ──────────────────────────────────────────────────
   function updateStats() {
-    const jobs = getDisplayJobs();
-    const total = jobs.length;
-    const interested = jobs.filter(j => getFeedback(j.id).status === 'interested').length;
-    const dismissed = jobs.filter(j => getFeedback(j.id).status === 'not-interested').length;
-    const pending = jobs.filter(j => !getFeedback(j.id).status).length;
-    const applied = jobs.filter(j => getFeedback(j.id).applied).length;
+    const all = getAllJobs();
+    document.getElementById('statTotal').textContent     = all.length;
+    document.getElementById('statStrong').textContent    = all.filter(j => j.fitScore >= 4).length;
+    document.getElementById('statInterested').textContent = all.filter(j => getFeedback(j.id).status === 'interested').length;
+    document.getElementById('statDismissed').textContent  = all.filter(j => getFeedback(j.id).status === 'not-interested').length;
+    document.getElementById('statPending').textContent    = all.filter(j => !getFeedback(j.id).status).length;
+    document.getElementById('statApplied').textContent   = all.filter(j => getFeedback(j.id).applied).length;
+  }
 
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statStrong').textContent = jobs.filter(j => j.fitScore === 5).length;
-    document.getElementById('statInterested').textContent = interested;
-    document.getElementById('statDismissed').textContent = dismissed;
-    document.getElementById('statPending').textContent = pending;
-    document.getElementById('statApplied').textContent = applied;
+  function updateTabCounts() {
+    document.getElementById('tc-active').textContent  = getActiveJobs().length;
+    document.getElementById('tc-archive').textContent = getArchivedJobs().length;
   }
 
   function updateActiveCount() {
-    const active = getDisplayJobs().filter(j => getFeedback(j.id).status !== 'not-interested').length;
-    document.getElementById('jobCount').textContent = active;
-  }
-
-  // ── Toggle hidden ──────────────────────────────────────────
-  function toggleHidden() {
-    showHidden = !showHidden;
-    document.getElementById('toggleHidden').textContent = showHidden ? 'Hide dismissed' : 'Show dismissed';
-    renderAll();
+    document.getElementById('jobCount').textContent = getActiveJobs().length;
   }
 
   // ── Export feedback ────────────────────────────────────────
   function exportFeedback() {
-    const summary = {
-      exportedAt: new Date().toISOString().split('T')[0],
-      selfAdded: [],
-      applied: [],
-      interested: [],
-      notInterested: [],
-      pending: []
-    };
+    const summary = { exportedAt: new Date().toISOString().split('T')[0], selfAdded: [], applied: [], interested: [], notInterested: [], pending: [] };
 
-    // Self-added jobs are the strongest signal — Jack found these himself
     manualJobs.forEach(j => {
       const fb = getFeedback(j.id);
-      summary.selfAdded.push({
-        id: j.id, title: j.title, company: j.company,
-        tags: j.tags, workType: j.workType,
-        applied: !!fb.applied,
-        comment: fb.comment || null,
-        note: j.fitNote || null
-      });
+      summary.selfAdded.push({ id: j.id, title: j.title, company: j.company, tags: j.tags, workType: j.workType, applied: !!fb.applied, comment: fb.comment || null, note: j.fitNote || null });
     });
 
-    getDisplayJobs().forEach(j => {
+    seenJobs.forEach(j => {
       const fb = getFeedback(j.id);
-      const entry = {
-        id: j.id,
-        title: j.title,
-        company: j.company,
-        tags: j.tags,
-        fitScore: j.fitScore,
-        applied: !!fb.applied,
-        comment: fb.comment || null
-      };
+      const entry = { id: j.id, title: j.title, company: j.company, tags: j.tags, fitScore: j.fitScore, applied: !!fb.applied, comment: fb.comment || null };
       if (fb.applied) summary.applied.push(entry);
       if (fb.status === 'interested') summary.interested.push(entry);
       else if (fb.status === 'not-interested') summary.notInterested.push(entry);
       else summary.pending.push(entry);
     });
 
-    // Build plain-language summary for the AI
     let aiSummary = '## Jack\'s Feedback Summary\n\n';
     if (summary.selfAdded.length) {
-      aiSummary += '### ⭐ SELF-ADDED (strongest signal — Jack found these himself):\n';
-      summary.selfAdded.forEach(e => {
-        aiSummary += `- **${e.title}** at ${e.company} (tags: ${e.tags.join(', ')})`;
-        if (e.note) aiSummary += ` — "${e.note}"`;
-        aiSummary += '\n';
-      });
-      aiSummary += '→ Actively search for MORE roles at these companies and with these tags/sectors.\n\n';
+      aiSummary += '### ⭐ SELF-ADDED (strongest signal):\n';
+      summary.selfAdded.forEach(e => { aiSummary += `- **${e.title}** at ${e.company} (tags: ${e.tags.join(', ')})`; if (e.note) aiSummary += ` — "${e.note}"`; aiSummary += '\n'; });
+      aiSummary += '→ Search for MORE roles at these companies and with these tags.\n\n';
     }
     if (summary.interested.length) {
       aiSummary += '### Interested in:\n';
-      summary.interested.forEach(e => {
-        aiSummary += `- **${e.title}** at ${e.company} (tags: ${e.tags.join(', ')})`;
-        if (e.comment) aiSummary += ` — "${e.comment}"`;
-        aiSummary += '\n';
-      });
+      summary.interested.forEach(e => { aiSummary += `- **${e.title}** at ${e.company}`; if (e.comment) aiSummary += ` — "${e.comment}"`; aiSummary += '\n'; });
     }
     if (summary.notInterested.length) {
-      aiSummary += '\n### Not interested in:\n';
-      summary.notInterested.forEach(e => {
-        aiSummary += `- **${e.title}** at ${e.company}`;
-        if (e.comment) aiSummary += ` — reason: "${e.comment}"`;
-        aiSummary += '\n';
-      });
+      aiSummary += '\n### Archived (not interested):\n';
+      summary.notInterested.forEach(e => { aiSummary += `- **${e.title}** at ${e.company}`; if (e.comment) aiSummary += ` — reason: "${e.comment}"`; aiSummary += '\n'; });
     }
-    aiSummary += '\n### Signals to use for future searches:\n';
-    aiSummary += '- Prioritise roles matching tags from the "interested" list above\n';
-    aiSummary += '- Avoid roles similar to the "not interested" list\n';
-    aiSummary += '- Use comments to refine company size, OTE, sector, and work-type preferences\n';
-
     summary.aiSummary = aiSummary;
 
     const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
@@ -723,11 +767,14 @@
   async function init() {
     loadFeedback();
     loadManualJobs();
+    loadSeenJobs();
+
     const data = await loadData();
-    // Ensure each job has an id
-    allJobs = data.jobs.map((j, i) => ({ ...j, id: j.id || `job-${i}` }));
+    const freshJobs = data.jobs.map((j, i) => ({ ...j, id: j.id || `job-${i}` }));
+    mergeIntoSeen(freshJobs);
 
     document.getElementById('lastUpdated').textContent = data.lastUpdated;
+
     renderAll();
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -741,6 +788,7 @@
 
   init();
 </script>
+
 <!-- Add a role modal -->
 <div class="modal-overlay" id="addModal" onclick="if(event.target===this)closeAddModal()">
   <div class="modal">
